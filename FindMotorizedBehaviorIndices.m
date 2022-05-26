@@ -56,31 +56,40 @@ function [behavior_indices_2] = SubFindBehaviorIndices(divideri, divideby, behav
    
     behavior_indices_2 = {}; 
     divider = divideby{divideri}; 
+
+    % If the first entry of behavior_indices_1 for this divider is NaN,
+    % then they'll all be NaN for this behavior. Don't divide any further.
+    if strcmp(behavior_indices_1{1,1}.(divider), 'NaN')
+
+        indices = cellfun(@num2str, num2cell(behavior_indices_1.index), 'UniformOutput', false)
+        behavior_indices_2 = {behavior_indices_1, ;
+
+        return
+    end
+    
     % For each entry to behavior_indices so far 
+    for higheri = 1:size(behavior_indices_1,1)
+        
+        % Get a new table of just the relevent cell of
+        % behavior_indices_1
+        holder = behavior_indices_1{higheri, 1};
 
-        for higheri = 1:size(behavior_indices_1,1)
-            
-            % Get a new table of just the relevent cell of
-            % behavior_indices_1
-            holder = behavior_indices_1{higheri, 1};
-           
+        % Find all the values that could match. 
+        division_values = unique(holder.(divider)); 
 
-            % Find all the values that could match. 
-            division_values = unique(holder.(divider)); 
-            
-             % For each division value, 
-            for valuei = 1:numel(division_values)
+        % For each division value, 
+        for valuei = 1:numel(division_values)
 
-                   % Get a new small table.
-                   g = holder(string(holder.(divider)) == division_values{valuei}, :);
-                   indices = cellfun(@num2str, num2cell(g.index), 'UniformOutput', false); 
+           % Get a new small table.
+           g = holder(string(holder.(divider)) == division_values{valuei}, :);
+           indices = cellfun(@num2str, num2cell(g.index), 'UniformOutput', false); 
 
-                   % Add it to list of tables.
-                   behavior_indices_2 = [behavior_indices_2; {g} {indices} ]; % {divider, division_values{divideri}}
+           % Add it to list of tables.
+           behavior_indices_2 = [behavior_indices_2; {g} {indices} ]; % {divider, division_values{divideri}}
 
-            end
-            
-        end 
-    % end
+        end
+        
+    end 
+   
 end 
 
