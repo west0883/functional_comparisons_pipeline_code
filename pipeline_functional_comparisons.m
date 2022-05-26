@@ -172,8 +172,9 @@ for transi = 1:numel(parameters.loop_variables.transformations)
     xticklabels({'motor rest', 'spon rest', '1600', '2000', '2400', '2800', 'spon walk'});
     colorbar;
     title([mouse ', ' transformation]);
-    savefig(['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\fluorescence analysis\PCA individual mouse\' transformation '\' mouse '\average_walk_rest_values_first20.fig']);
-
+    dir_out = ['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\functional comparisons\PCA individual mouse\' transformation '\average walk and rest\' mouse '\'];
+    mkdir(dir_out);
+    savefig([dir_out 'average_walk_rest_values_first20.fig']);
 end
 
 %% Visualize average values across rolled periods that may need to be compared
@@ -205,7 +206,7 @@ parameters.loop_list.things_to_load.data.variable= {'values_average'};
 parameters.loop_list.things_to_load.data.level = 'mouse';
 
 % Output
-parameters.loop_list.things_to_save.visual_fig.dir = {[parameters.dir_exper 'fluorescence analysis\'], 'data_type', '\', 'transformation', '\', 'mouse', '\average visualization\'};
+parameters.loop_list.things_to_save.visual_fig.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation', '\average visualization\', 'mouse', '\'};
 parameters.loop_list.things_to_save.visual_fig.filename= {'rolled_average_', 'period', '.fig'};
 parameters.loop_list.things_to_save.visual_fig.variable= {'rolled_average'}; 
 parameters.loop_list.things_to_save.visual_fig.level = 'period';
@@ -260,12 +261,12 @@ parameters.loop_list.things_to_load.data.variable= {'values{', 'index', '}'};
 parameters.loop_list.things_to_load.data.level = 'mouse';
 
 % Output 
-parameters.loop_list.things_to_save.concatenated_data.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data_type', '\', 'transformation', '\', 'mouse', '\variable duration averaged\'};
+parameters.loop_list.things_to_save.concatenated_data.dir = {[parameters.dir_exper 'functional comparisons\'],'data_type', '\', 'transformation', '\variable duration\no division\', 'mouse','\'};
 parameters.loop_list.things_to_save.concatenated_data.filename= {'values_concatenated.mat'};
 parameters.loop_list.things_to_save.concatenated_data.variable= {'values_concatenated{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_save.concatenated_data.level = 'mouse';
 
-parameters.loop_list.things_to_save.concatenated_origin.dir = {[parameters.dir_exper 'fluorescence analysis\'], 'data_type', '\','transformation', '\', 'mouse', '\variable duration averaged\'};
+parameters.loop_list.things_to_save.concatenated_origin.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
 parameters.loop_list.things_to_save.concatenated_origin.filename= {'values_concatenated_origin.mat'};
 parameters.loop_list.things_to_save.concatenated_origin.variable= {'values_concatenated_origin{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_save.concatenated_origin.level = 'mouse';
@@ -297,18 +298,18 @@ parameters.evaluation_instructions = {{'data_evaluated = sum(~isnan(parameters.d
 parameters.averageDim = 3;
                         
 % Input 
-parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data_type', '\','transformation', '\', 'mouse', '\variable duration averaged\'};
+parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'],'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
 parameters.loop_list.things_to_load.data.filename= {'values_concatenated.mat'};
 parameters.loop_list.things_to_load.data.variable= {'values_concatenated{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_load.data.level = 'mouse';
 
 % Output 
-parameters.loop_list.things_to_save.data_evaluated.dir = {[parameters.dir_exper 'fluorescence analysis\'], 'data_type', '\', 'transformation', '\', 'mouse', '\variable duration averaged\'};
+parameters.loop_list.things_to_save.data_evaluated.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation','\variable duration\no division\', 'mouse', '\'};
 parameters.loop_list.things_to_save.data_evaluated.filename= {'values_number.mat'};
 parameters.loop_list.things_to_save.data_evaluated.variable= {'values_number{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_save.data_evaluated.level = 'mouse';
 
-parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'fluorescence analysis\'], 'data_type', '\','transformation', '\', 'mouse', '\variable duration averaged\'};
+parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
 parameters.loop_list.things_to_save.average.filename= {'values_averaged.mat'};
 parameters.loop_list.things_to_save.average.variable= {'values_average{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_save.average.level = 'mouse';
@@ -360,12 +361,12 @@ parameters.loop_list.things_to_load.data.variable= {'values{', 'index', '}'};
 parameters.loop_list.things_to_load.data.level = 'mouse';
 
 % Output 
-parameters.loop_list.things_to_save.concatenated_data.dir = {[parameters.dir_exper 'functional comparisons\'],'data_type', '\', 'transformation', '\variable duration\by accel\', 'mouse', '\'};
+parameters.loop_list.things_to_save.concatenated_data.dir = {[parameters.dir_exper 'functional comparisons\'],'data_type', '\', 'transformation', '\variable duration\divided by accel\', 'mouse', '\'};
 parameters.loop_list.things_to_save.concatenated_data.filename= {'period', '.mat'};
 parameters.loop_list.things_to_save.concatenated_data.variable= {'values_concatenated.x', 'accel'}; 
 parameters.loop_list.things_to_save.concatenated_data.level = 'period';
 
-parameters.loop_list.things_to_save.concatenated_origin.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation', '\variable duration\by accel\', 'mouse', '\'};
+parameters.loop_list.things_to_save.concatenated_origin.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation', '\variable duration\divided by accel\', 'mouse', '\'};
 parameters.loop_list.things_to_save.concatenated_origin.filename= {'period', '_concatenated_origin.mat'};
 parameters.loop_list.things_to_save.concatenated_origin.variable= {'values_concatenated_origin.x', 'accel'}; 
 parameters.loop_list.things_to_save.concatenated_origin.level = 'period';
@@ -403,18 +404,18 @@ parameters.evaluation_instructions = {{'data_evaluated = sum(~isnan(parameters.d
 parameters.averageDim = 3;
                         
 % Input 
-parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'],'data_type', '\', 'transformation', '\variable duration\by accel\', 'mouse', '\'};
+parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'],'data_type', '\', 'transformation', '\variable duration\divided by accel\', 'mouse', '\'};
 parameters.loop_list.things_to_load.data.filename= {'period', '.mat'};
 parameters.loop_list.things_to_load.data.variable= {'values_concatenated.x', 'accel'}; 
 parameters.loop_list.things_to_load.data.level = 'period';
 
 % Output
-parameters.loop_list.things_to_save.data_evaluated.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation', '\variable duration\by accel\', 'mouse', '\'};
+parameters.loop_list.things_to_save.data_evaluated.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation', '\variable duration\divided by accel\', 'mouse', '\'};
 parameters.loop_list.things_to_save.data_evaluated.filename= {'period', '_count.mat'};
 parameters.loop_list.things_to_save.data_evaluated.variable= {'values_number.x', 'accel'}; 
 parameters.loop_list.things_to_save.data_evaluated.level = 'period';
 
-parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation', '\variable duration\by accel\', 'mouse', '\'};
+parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation', '\variable duration\divided by accel\', 'mouse', '\'};
 parameters.loop_list.things_to_save.average.filename= {'period', '_averaged.mat'};
 parameters.loop_list.things_to_save.average.variable= {'values_averaged.x', 'accel'}; 
 parameters.loop_list.things_to_save.average.level = 'period';
@@ -434,6 +435,6 @@ parameters.loop_list.iterators = {
                'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'};
 
 parameters.spontaneous_periods_dir = {[parameters.dir_exper 'fluorescence analysis\PCA individual mouse\'], 'transformation', '\', 'mouse', '\instances reshaped\'};
-parameters.motorized_periods_dir = {[parameters.dir_exper 'functional comparisons\PCA individual mouse\'], 'transformation', '\variable duration\by accel\', 'mouse', '\'};
+parameters.motorized_periods_dir = {[parameters.dir_exper 'functional comparisons\PCA individual mouse\'], 'transformation', '\variable duration\divided by accel\', 'mouse', '\'};
 parameters.dir_out = {[parameters.dir_exper 'functional comparisons\PCA individual mouse\'], 'transformation', '\all starts and stops\', 'mouse', '\'};
 plot_starts_and_stops_together(parameters);
