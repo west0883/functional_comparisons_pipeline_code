@@ -324,192 +324,192 @@ parameters.loop_list.things_to_save.visual_fig.level = 'period';
 RunAnalysis({@VisualizeAverageRolledData}, parameters);
 close all;
 
-%% Concatenate variable durations together, aligned to front -- not divided by acceleration rate
-% Then average.
-% Try to plot with alpha values proportional to number of instances
-% Indclude a m_stop_ending period -- where stop is alinged to end of period. 
-variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
-                    'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel'};
-
-period_indices = {};
-for i = 1:numel(variable_periods)
-    period_indices{i} = find(contains(periods_bothConditions.condition, variable_periods{i}));
-end 
-
-% Add the m_stop_ending. 
-variable_periods = [variable_periods, {'m_stop_ending'}];
-period_indices = [period_indices, find(contains(periods_bothConditions.condition, 'm_stop'))];
-
-if isfield(parameters, 'loop_list')
-parameters = rmfield(parameters,'loop_list');
-end
-
-% Iterators
-parameters.loop_list.iterators = {
-               'data_type', {'loop_variables.data_type'}, 'data_type_iterator';
-               'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
-               'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'; 
-               'period', {'loop_variables.periods'}, 'period_iterator';  
-               'index', {'loop_variables.period_indices{', 'period_iterator', '}'}, 'index_iterator'
-               };
-
-parameters.loop_variables.periods = variable_periods;
-parameters.loop_variables.period_indices = period_indices; 
-
-% Clear concatenated_data and start a new concatenation if this is the
-% first of a new set.
-% Initialize with an empty matrix of NaNs.(values, max roll number, number of instances). 
-% If it's m_stop_ending, align to end.
-parameters.evaluation_instructions = {{'if parameters.values{end} == 1;'...
-                                       'parameters.concatenated_data = [];'...
-                                       'end;'...
-                                      'data_evaluated = NaN(parameters.number_of_values, parameters.max_roll_number, size(parameters.data,3));'...
-                                      'if strcmp(parameters.values{4}, "m_stop_ending");' ... 
-                                        'data_evaluated(:, [parameters.max_roll_number - size(parameters.data,2) + 1 : parameters.max_roll_number],:) = parameters.data;'...
-                                      'else;' ...
-                                      'data_evaluated(:, [1:size(parameters.data,2)],:) = parameters.data;'...
-                                      'end';
-                                      }};
-
-parameters.number_of_values = (number_of_sources^2 - number_of_sources)/2;
-parameters.max_roll_number = 24;
-
-parameters.concatDim = 3;
-
-% Input 
-parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'fluorescence analysis\'], 'data_type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
-parameters.loop_list.things_to_load.data.filename= {'values.mat'};
-parameters.loop_list.things_to_load.data.variable= {'values{', 'index', '}'}; 
-parameters.loop_list.things_to_load.data.level = 'mouse';
-
-% Output 
-parameters.loop_list.things_to_save.concatenated_data.dir = {[parameters.dir_exper 'functional comparisons\'],'data_type', '\', 'transformation', '\variable duration\no division\', 'mouse','\'};
-parameters.loop_list.things_to_save.concatenated_data.filename= {'values_concatenated.mat'};
-parameters.loop_list.things_to_save.concatenated_data.variable= {'values_concatenated{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.concatenated_data.level = 'mouse';
-
-parameters.loop_list.things_to_save.concatenated_origin.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
-parameters.loop_list.things_to_save.concatenated_origin.filename= {'values_concatenated_origin.mat'};
-parameters.loop_list.things_to_save.concatenated_origin.variable= {'values_concatenated_origin{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.concatenated_origin.level = 'mouse';
-
-parameters.loop_list.things_to_rename = {{'data_evaluated', 'data'}};
-                                
-RunAnalysis({@EvaluateOnData, @ConcatenateData}, parameters);
-
-%% Average the variable values, counting the number of contributions. -- not divided by acceleration rate
-variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
-                    'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
-                    'm_stop_ending'};
-
-if isfield(parameters, 'loop_list')
-parameters = rmfield(parameters,'loop_list');
-end
-
-% Iterators
-parameters.loop_list.iterators = {
-               'data_type', {'loop_variables.data_type'}, 'data_type_iterator';
-               'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
-               'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'; 
-               'period', {'loop_variables.periods'}, 'period_iterator';  
-               };
-
-parameters.loop_variables.periods = variable_periods;
-
-% Count & save number of non- NaNs
-parameters.evaluation_instructions = {{'data_evaluated = sum(~isnan(parameters.data), 3);'}}; 
-parameters.averageDim = 3;
-                        
-% Input 
-parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'],'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
-parameters.loop_list.things_to_load.data.filename= {'values_concatenated.mat'};
-parameters.loop_list.things_to_load.data.variable= {'values_concatenated{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_load.data.level = 'mouse';
-
-% Output 
-parameters.loop_list.things_to_save.data_evaluated.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation','\variable duration\no division\', 'mouse', '\'};
-parameters.loop_list.things_to_save.data_evaluated.filename= {'values_number.mat'};
-parameters.loop_list.things_to_save.data_evaluated.variable= {'values_number{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.data_evaluated.level = 'mouse';
-
-parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
-parameters.loop_list.things_to_save.average.filename= {'values_average.mat'};
-parameters.loop_list.things_to_save.average.variable= {'values_average{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.average.level = 'mouse';
-
-parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
-parameters.loop_list.things_to_save.std_dev.filename= {'values_std.mat'};
-parameters.loop_list.things_to_save.std_dev.variable= {'values_std{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.std_dev.level = 'mouse';
-
-RunAnalysis({@EvaluateOnData, @AverageData}, parameters);
-
-%% Across mice-- concatenate & average the average variable duration values.
-variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
-                    'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
-                    'm_stop_ending'};
-
-if isfield(parameters, 'loop_list')
-parameters = rmfield(parameters,'loop_list');
-end
-
-parameters.loop_variables.periods = variable_periods;
-
-% Iterators
-parameters.loop_list.iterators = {
-               'data_type', {'loop_variables.data_type'}, 'data_type_iterator';
-               'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
-               'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'; 
-               'period', {'loop_variables.periods'}, 'period_iterator';  
-               };
-
-parameters.concatDim = 3;
-
-% Input
-parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
-parameters.loop_list.things_to_load.data.filename= {'values_average.mat'};
-parameters.loop_list.things_to_load.data.variable= {'values_average{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_load.data.level = 'mouse';
-
-% Output
-parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\across mice\'};
-parameters.loop_list.things_to_save.average.filename= {'values_average.mat'};
-parameters.loop_list.things_to_save.average.variable= {'values_acrossmice_average{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.average.level = 'transformation';
-
-parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\across mice\'};
-parameters.loop_list.things_to_save.std_dev.filename= {'values_std_dev.mat'};
-parameters.loop_list.things_to_save.std_dev.variable= {'values_acrossmice_std_dev{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.std_dev.level = 'transformation';
-
-parameters.loop_list.things_to_rename = {{'concatenated_data', 'data'}};
-
-RunAnalysis({@ConcatenateData, @AverageData}, parameters);
-
-%% Across mice -- count the (average) number of instances per mouse contributing to 
-% the the values in the variable duration periods.
-variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
-                    'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
-                    'm_stop_ending'};
-
-% Input 
-parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation','\variable duration\no division\', 'mouse', '\'};
-parameters.loop_list.things_to_load.data.filename= {'values_number.mat'};
-parameters.loop_list.things_to_load.data.variable= {'values_number{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_load.data.level = 'mouse';
-
-% Output
-parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\across mice\'};
-parameters.loop_list.things_to_save.average.filename= {'values_number_average.mat'};
-parameters.loop_list.things_to_save.average.variable= {'values_number_average{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.average.level = 'transformation';
-
-arameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\across mice\'};
-parameters.loop_list.things_to_save.std_dev.filename= {'values_number_std_dev.mat'};
-parameters.loop_list.things_to_save.std_dev.variable= {'values_number_std_dev{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.std_dev.level = 'transformation';
-
-RunAnalysis({@ConcatenateData, @AverageData}, parameters);
+% %% Concatenate variable durations together, aligned to front -- not divided by acceleration rate
+% % Then average.
+% % Try to plot with alpha values proportional to number of instances
+% % Indclude a m_stop_ending period -- where stop is alinged to end of period. 
+% variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
+%                     'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel'};
+% 
+% period_indices = {};
+% for i = 1:numel(variable_periods)
+%     period_indices{i} = find(contains(periods_bothConditions.condition, variable_periods{i}));
+% end 
+% 
+% % Add the m_stop_ending. 
+% variable_periods = [variable_periods, {'m_stop_ending'}];
+% period_indices = [period_indices, find(contains(periods_bothConditions.condition, 'm_stop'))];
+% 
+% if isfield(parameters, 'loop_list')
+% parameters = rmfield(parameters,'loop_list');
+% end
+% 
+% % Iterators
+% parameters.loop_list.iterators = {
+%                'data_type', {'loop_variables.data_type'}, 'data_type_iterator';
+%                'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
+%                'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'; 
+%                'period', {'loop_variables.periods'}, 'period_iterator';  
+%                'index', {'loop_variables.period_indices{', 'period_iterator', '}'}, 'index_iterator'
+%                };
+% 
+% parameters.loop_variables.periods = variable_periods;
+% parameters.loop_variables.period_indices = period_indices; 
+% 
+% % Clear concatenated_data and start a new concatenation if this is the
+% % first of a new set.
+% % Initialize with an empty matrix of NaNs.(values, max roll number, number of instances). 
+% % If it's m_stop_ending, align to end.
+% parameters.evaluation_instructions = {{'if parameters.values{end} == 1;'...
+%                                        'parameters.concatenated_data = [];'...
+%                                        'end;'...
+%                                       'data_evaluated = NaN(parameters.number_of_values, parameters.max_roll_number, size(parameters.data,3));'...
+%                                       'if strcmp(parameters.values{4}, "m_stop_ending");' ... 
+%                                         'data_evaluated(:, [parameters.max_roll_number - size(parameters.data,2) + 1 : parameters.max_roll_number],:) = parameters.data;'...
+%                                       'else;' ...
+%                                       'data_evaluated(:, [1:size(parameters.data,2)],:) = parameters.data;'...
+%                                       'end';
+%                                       }};
+% 
+% parameters.number_of_values = (number_of_sources^2 - number_of_sources)/2;
+% parameters.max_roll_number = 24;
+% 
+% parameters.concatDim = 3;
+% 
+% % Input 
+% parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'fluorescence analysis\'], 'data_type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
+% parameters.loop_list.things_to_load.data.filename= {'values.mat'};
+% parameters.loop_list.things_to_load.data.variable= {'values{', 'index', '}'}; 
+% parameters.loop_list.things_to_load.data.level = 'mouse';
+% 
+% % Output 
+% parameters.loop_list.things_to_save.concatenated_data.dir = {[parameters.dir_exper 'functional comparisons\'],'data_type', '\', 'transformation', '\variable duration\no division\', 'mouse','\'};
+% parameters.loop_list.things_to_save.concatenated_data.filename= {'values_concatenated.mat'};
+% parameters.loop_list.things_to_save.concatenated_data.variable= {'values_concatenated{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_save.concatenated_data.level = 'mouse';
+% 
+% parameters.loop_list.things_to_save.concatenated_origin.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
+% parameters.loop_list.things_to_save.concatenated_origin.filename= {'values_concatenated_origin.mat'};
+% parameters.loop_list.things_to_save.concatenated_origin.variable= {'values_concatenated_origin{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_save.concatenated_origin.level = 'mouse';
+% 
+% parameters.loop_list.things_to_rename = {{'data_evaluated', 'data'}};
+%                                 
+% RunAnalysis({@EvaluateOnData, @ConcatenateData}, parameters);
+% 
+% %% Average the variable values, counting the number of contributions. -- not divided by acceleration rate
+% variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
+%                     'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
+%                     'm_stop_ending'};
+% 
+% if isfield(parameters, 'loop_list')
+% parameters = rmfield(parameters,'loop_list');
+% end
+% 
+% % Iterators
+% parameters.loop_list.iterators = {
+%                'data_type', {'loop_variables.data_type'}, 'data_type_iterator';
+%                'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
+%                'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'; 
+%                'period', {'loop_variables.periods'}, 'period_iterator';  
+%                };
+% 
+% parameters.loop_variables.periods = variable_periods;
+% 
+% % Count & save number of non- NaNs
+% parameters.evaluation_instructions = {{'data_evaluated = sum(~isnan(parameters.data), 3);'}}; 
+% parameters.averageDim = 3;
+%                         
+% % Input 
+% parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'],'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
+% parameters.loop_list.things_to_load.data.filename= {'values_concatenated.mat'};
+% parameters.loop_list.things_to_load.data.variable= {'values_concatenated{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_load.data.level = 'mouse';
+% 
+% % Output 
+% parameters.loop_list.things_to_save.data_evaluated.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation','\variable duration\no division\', 'mouse', '\'};
+% parameters.loop_list.things_to_save.data_evaluated.filename= {'values_number.mat'};
+% parameters.loop_list.things_to_save.data_evaluated.variable= {'values_number{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_save.data_evaluated.level = 'mouse';
+% 
+% parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
+% parameters.loop_list.things_to_save.average.filename= {'values_average.mat'};
+% parameters.loop_list.things_to_save.average.variable= {'values_average{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_save.average.level = 'mouse';
+% 
+% parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
+% parameters.loop_list.things_to_save.std_dev.filename= {'values_std.mat'};
+% parameters.loop_list.things_to_save.std_dev.variable= {'values_std{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_save.std_dev.level = 'mouse';
+% 
+% RunAnalysis({@EvaluateOnData, @AverageData}, parameters);
+% 
+% %% Across mice-- concatenate & average the average variable duration values.
+% variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
+%                     'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
+%                     'm_stop_ending'};
+% 
+% if isfield(parameters, 'loop_list')
+% parameters = rmfield(parameters,'loop_list');
+% end
+% 
+% parameters.loop_variables.periods = variable_periods;
+% 
+% % Iterators
+% parameters.loop_list.iterators = {
+%                'data_type', {'loop_variables.data_type'}, 'data_type_iterator';
+%                'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
+%                'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'; 
+%                'period', {'loop_variables.periods'}, 'period_iterator';  
+%                };
+% 
+% parameters.concatDim = 3;
+% 
+% % Input
+% parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
+% parameters.loop_list.things_to_load.data.filename= {'values_average.mat'};
+% parameters.loop_list.things_to_load.data.variable= {'values_average{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_load.data.level = 'mouse';
+% 
+% % Output
+% parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\across mice\'};
+% parameters.loop_list.things_to_save.average.filename= {'values_average.mat'};
+% parameters.loop_list.things_to_save.average.variable= {'values_acrossmice_average{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_save.average.level = 'transformation';
+% 
+% parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\across mice\'};
+% parameters.loop_list.things_to_save.std_dev.filename= {'values_std_dev.mat'};
+% parameters.loop_list.things_to_save.std_dev.variable= {'values_acrossmice_std_dev{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_save.std_dev.level = 'transformation';
+% 
+% parameters.loop_list.things_to_rename = {{'concatenated_data', 'data'}};
+% 
+% RunAnalysis({@ConcatenateData, @AverageData}, parameters);
+% 
+% %% Across mice -- count the (average) number of instances per mouse contributing to 
+% % the the values in the variable duration periods.
+% variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
+%                     'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
+%                     'm_stop_ending'};
+% 
+% % Input 
+% parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation','\variable duration\no division\', 'mouse', '\'};
+% parameters.loop_list.things_to_load.data.filename= {'values_number.mat'};
+% parameters.loop_list.things_to_load.data.variable= {'values_number{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_load.data.level = 'mouse';
+% 
+% % Output
+% parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\across mice\'};
+% parameters.loop_list.things_to_save.average.filename= {'values_number_average.mat'};
+% parameters.loop_list.things_to_save.average.variable= {'values_number_average{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_save.average.level = 'transformation';
+% 
+% arameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\across mice\'};
+% parameters.loop_list.things_to_save.std_dev.filename= {'values_number_std_dev.mat'};
+% parameters.loop_list.things_to_save.std_dev.variable= {'values_number_std_dev{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_save.std_dev.level = 'transformation';
+% 
+% RunAnalysis({@ConcatenateData, @AverageData}, parameters);
 
 %% Concatenate variable durations together, divided by acceleration rate
 % Then average.
@@ -722,7 +722,7 @@ parameters.motorized_periods_dir = {[parameters.dir_exper 'functional comparison
 parameters.dir_out = {[parameters.dir_exper 'functional comparisons\PCA across mice\'], 'transformation', '\all starts and stops\', 'mouse', '\'};
 plot_starts_and_stops_together(parameters);
 
-%% Across mice -- Plot starts & stops together in same figures.
+%% Across mice -- Divided by accel, plot starts & stops together in same figures. 
 
 %% Look at difference between spontaneous & motorized walks.
 % Start with speed regressions? 
