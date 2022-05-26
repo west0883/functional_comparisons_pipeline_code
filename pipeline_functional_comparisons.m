@@ -242,11 +242,11 @@ parameters.loop_variables.periods = variable_periods;
 parameters.loop_variables.period_indices = parameters.period_indices; 
 
 % Initialize with an empty matrix of NaNs.(values, ,max roll number)
-parameters.evaluation_instructions = { 'if parameters.values{end} == 1;'...
+parameters.evaluation_instructions = {{'if parameters.values{end} == 1;'...
                                        'parameters.concatenated_data = [];'...
                                        'end;'...
                                       'data_evaluated = NaN(parameters.number_of_values, parameters.max_roll_number, size(parameters.data,3));'...
-                                      'data_evaluated(:, [1:size(parameters.data,2)],:) = parameters.data;'};
+                                      'data_evaluated(:, [1:size(parameters.data,2)],:) = parameters.data;'}};
 
 parameters.number_of_values = (number_of_sources^2 - number_of_sources)/2;
 parameters.max_roll_number = 24;
@@ -293,7 +293,7 @@ parameters.loop_list.iterators = {
 parameters.loop_variables.periods = variable_periods;
 
 % Count & save number of non- NaNs
-parameters.evaluation_instructions = { 'data_evaluated = sum(~isnan(parameters.data), 3);'}; 
+parameters.evaluation_instructions = {{'data_evaluated = sum(~isnan(parameters.data), 3);'}}; 
 parameters.averageDim = 3;
                         
 % Input 
@@ -319,7 +319,8 @@ RunAnalysis({@EvaluateOnData, @AverageData}, parameters);
 % Then average.
 % Try to plot with alpha values proportional to number of instances
 variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
-                    'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel'};
+                    'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
+                     'full_onset', 'full_offset', 'startwalk', 'stopwalk'};
 divideby = {'accel'};
 [behavior_indices] = FindMotorizedBehaviorIndices(variable_periods, divideby, periods_bothConditions);
 
@@ -341,11 +342,11 @@ parameters.loop_variables.periods = variable_periods;
 parameters.loop_variables.period_indices = behavior_indices; 
 
 % Initialize with an empty matrix of NaNs.(values, ,max roll number)
-parameters.evaluation_instructions = { 'if parameters.values{end} == 1;'...
+parameters.evaluation_instructions = {{'if parameters.values{end} == 1;'...
                                        'parameters.concatenated_data = [];'...
                                        'end;'...
                                       'data_evaluated = NaN(parameters.number_of_values, parameters.max_roll_number, size(parameters.data,3));'...
-                                      'data_evaluated(:, [1:size(parameters.data,2)],:) = parameters.data;'};
+                                      'data_evaluated(:, [1:size(parameters.data,2)],:) = parameters.data;'}};
 
 parameters.number_of_values = (number_of_sources^2 - number_of_sources)/2;
 parameters.max_roll_number = 24;
@@ -398,7 +399,7 @@ parameters.loop_variables.periods = variable_periods;
 parameters.loop_variables.period_indices = behavior_indices;
 
 % Count & save number of non- NaNs
-parameters.evaluation_instructions = { 'data_evaluated = sum(~isnan(parameters.data), 3);'}; 
+parameters.evaluation_instructions = {{'data_evaluated = sum(~isnan(parameters.data), 3);'}}; 
 parameters.averageDim = 3;
                         
 % Input 
