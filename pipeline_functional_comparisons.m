@@ -219,12 +219,18 @@ close all;
 %% Concatenate variable durations together, aligned to front -- not divided by acceleration rate
 % Then average.
 % Try to plot with alpha values proportional to number of instances
+% Indclude a m_stop_ending period -- where stop is alinged to end of period. 
 variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
                     'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel'};
 
+period_indices = {};
 for i = 1:numel(variable_periods)
-    parameters.period_indices{i} = find(contains(periods_bothConditions.condition, variable_periods{i}));
+    period_indices{i} = find(contains(periods_bothConditions.condition, variable_periods{i}));
 end 
+
+% Add the m_stop_ending. 
+variable_periods = [variable_periods, {'m_stop_ending'}];
+period_indices = [period_indices, find(contains(periods_bothConditions.condition, 'm_stop'))];
 
 if isfield(parameters, 'loop_list')
 parameters = rmfield(parameters,'loop_list');
@@ -240,14 +246,22 @@ parameters.loop_list.iterators = {
                };
 
 parameters.loop_variables.periods = variable_periods;
-parameters.loop_variables.period_indices = parameters.period_indices; 
+parameters.loop_variables.period_indices = period_indices; 
 
-% Initialize with an empty matrix of NaNs.(values, ,max roll number)
+% Clear concatenated_data and start a new concatenation if this is the
+% first of a new set.
+% Initialize with an empty matrix of NaNs.(values, max roll number, number of instances). 
+% If it's m_stop_ending, align to end.
 parameters.evaluation_instructions = {{'if parameters.values{end} == 1;'...
                                        'parameters.concatenated_data = [];'...
                                        'end;'...
                                       'data_evaluated = NaN(parameters.number_of_values, parameters.max_roll_number, size(parameters.data,3));'...
-                                      'data_evaluated(:, [1:size(parameters.data,2)],:) = parameters.data;'}};
+                                      'if strcmp(parameters.values{4}, "m_stop_ending");' ... 
+                                        'data_evaluated(:, [parameters.max_roll_number - size(parameters.data,2) + 1 : parameters.max_roll_number],:) = parameters.data;'...
+                                      'else;' ...
+                                      'data_evaluated(:, [1:size(parameters.data,2)],:) = parameters.data;'...
+                                      'end';
+                                      }};
 
 parameters.number_of_values = (number_of_sources^2 - number_of_sources)/2;
 parameters.max_roll_number = 24;
@@ -277,7 +291,8 @@ RunAnalysis({@EvaluateOnData, @ConcatenateData}, parameters);
 
 %% Average the variable values, counting the number of contributions. -- not divided by acceleration rate
 variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
-                    'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel'};
+                    'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
+                    'm_stop_ending'};
 
 if isfield(parameters, 'loop_list')
 parameters = rmfield(parameters,'loop_list');
@@ -323,7 +338,12 @@ variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
                     'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
                      'full_onset', 'full_offset', 'startwalk', 'stopwalk'};
 divideby = {'accel'};
-[behavior_indices] = FindMotorizedBehaviorIndices(variable_periods, divideby, periods_bothConditions);
+behavior_indices = FindMotorizedBehaviorIndices(variable_periods, divideby, periods_bothConditions);
+
+% Add the m_stop_ending. 
+variable_periods = [variable_periods, {'m_stop_ending'}];
+behavior_indices(size(behavior_indices,2) + 1) = behavior_indices(2);
+behavior_indices(size(behavior_indices, 2) + 1).name = 'm_stop_ending';
 
 if isfield(parameters, 'loop_list')
 parameters = rmfield(parameters,'loop_list');
@@ -342,12 +362,17 @@ parameters.loop_list.iterators = {
 parameters.loop_variables.periods = variable_periods;
 parameters.loop_variables.period_indices = behavior_indices; 
 
-% Initialize with an empty matrix of NaNs.(values, ,max roll number)
+% Initialize with an empty matrix of NaNs.(values, ,max roll number). If
+% the period is m_stop_ending, put at end of matrix. 
 parameters.evaluation_instructions = {{'if parameters.values{end} == 1;'...
                                        'parameters.concatenated_data = [];'...
                                        'end;'...
-                                      'data_evaluated = NaN(parameters.number_of_values, parameters.max_roll_number, size(parameters.data,3));'...
-                                      'data_evaluated(:, [1:size(parameters.data,2)],:) = parameters.data;'}};
+                                       'data_evaluated = NaN(parameters.number_of_values, parameters.max_roll_number, size(parameters.data,3));'...
+                                       'if strcmp(parameters.values{4}, "m_stop_ending");' ... 
+                                        'data_evaluated(:, [parameters.max_roll_number - size(parameters.data,2) + 1 : parameters.max_roll_number],:) = parameters.data;'...
+                                      'else;' ...
+                                      'data_evaluated(:, [1:size(parameters.data,2)],:) = parameters.data;'...
+                                      'end;'}};
 
 parameters.number_of_values = (number_of_sources^2 - number_of_sources)/2;
 parameters.max_roll_number = 24;
@@ -382,6 +407,11 @@ variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
 
 divideby = {'accel'};
 [behavior_indices] = FindMotorizedBehaviorIndices(variable_periods, divideby, periods_bothConditions);
+
+% Add the m_stop_ending. 
+variable_periods = [variable_periods, {'m_stop_ending'}];
+behavior_indices(size(behavior_indices,2) + 1) = behavior_indices(2);
+behavior_indices(size(behavior_indices, 2) + 1).name = 'm_stop_ending';
 
 if isfield(parameters, 'loop_list')
     parameters = rmfield(parameters,'loop_list');
