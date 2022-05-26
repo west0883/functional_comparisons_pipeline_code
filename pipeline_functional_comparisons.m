@@ -422,15 +422,8 @@ parameters.loop_list.things_to_save.average.level = 'period';
 RunAnalysis({@EvaluateOnData, @AverageData}, parameters);
 
 
-%% Plot starts & stops together in same figures 
+%% Plot starts & stops together in same figures (per mouse)
 % (divided by accel)
-start_periods = {'m_start'};
-stop_periods = {'m_stop'}; 
-
-divideby = {'accel'};
-parameters.start_indices = FindMotorizedBehaviorIndices(start_periods, divideby, periods_bothConditions);
-parameters.stop_indices = FindMotorizedBehaviorIndices(stop_periods, divideby, periods_bothConditions);
-
 if isfield(parameters, 'loop_list')
 parameters = rmfield(parameters,'loop_list');
 end
