@@ -61,8 +61,13 @@ function [behavior_indices_2] = SubFindBehaviorIndices(divideri, divideby, behav
     % then they'll all be NaN for this behavior. Don't divide any further.
     if strcmp(behavior_indices_1{1,1}.(divider), 'NaN')
 
-        indices = cellfun(@num2str, num2cell(behavior_indices_1.index), 'UniformOutput', false)
-        behavior_indices_2 = {behavior_indices_1, ;
+        % If it's the firt division, put indices into second cell column.
+        if divideri == 1
+            indices = cellfun(@num2str, num2cell(behavior_indices_1{1}.index), 'UniformOutput', false);
+            behavior_indices_1{2} = indices;
+        end
+
+            behavior_indices_2 = behavior_indices_1; 
 
         return
     end
