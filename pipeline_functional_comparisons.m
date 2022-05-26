@@ -645,3 +645,52 @@ parameters.dir_out = {[parameters.dir_exper 'functional comparisons\PCA across m
 plot_starts_and_stops_together(parameters);
 
 %% Across mice -- Plot starts & stops together in same figures.
+
+%% Look at difference between spontaneous & motorized walks.
+% Start with speed regressions? 
+
+%% Look at effect of accel on motorized start/stop. 
+% Could treat as time-invarying 
+% and/or could do a "compare the timing of the maximum time point" thing
+
+%% Look at spontaneous vs motorized start/stop
+% May need to do the "compare the maximum time point" thing or something.
+% And/or do only a comparison to the 800 acceleration rate or something.
+
+%% Look at similarities/differences between start/stop vs accel/decel
+% May need to do the "compare the maximum time point" thing or something.
+
+%% Look at the effect of acceleration rate (if any) on accel/decel. 
+% Don't break up by start or end speed/duration, because you'll have the
+% variable duration plots. 
+% Figure out how to compare these, because the timing & therefore the
+% placement of the potentially relevant values in the matrices may be
+% different. Maybe compare the values of a maximum time point, and/or the timing 
+% of that time point.
+
+%% Look at the effect of speeds (if any) on accel/decell
+% For both accel & decel, and for both deceleration rates, group by start speed
+% Then subtract/ compare the difference of the two higher speeds to the
+% lowest speed ( & probably to each other). 
+% Don't need to group by end speed or duration, because you'll have the variable
+% duration plots. 
+
+%% Look at finished periods
+% Look at the effect of current speed (by comparing pairs of behaviors
+% where the only thing that differs is the current speed).
+% Look at the effect of accel (by comparing pairs of behaviors where the
+% only thing that differs is the accel)
+% Effect of previous speed (by comparing pairs of behaviors where the
+% only thing that differs is the previous speed/duration)
+
+%% Look at warning pergit iods
+% Effect of warning compared to same-speed continued and/or paired no warning probe. 
+% Look at the effect of current speed (by comparing pairs of behaviors
+% where the only thing that differs is the current speed).
+
+%% Look at effect of warning periods on behavior
+% (by comparing pairs of behaviors
+% where the only thing that differs is if the warning was given or not) --
+% might need to break this down into behavior type & accels 
+
+ 
