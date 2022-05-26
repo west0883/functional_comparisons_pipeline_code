@@ -117,8 +117,7 @@ for transi = 1:numel(parameters.loop_variables.transformations)
     sgtitle([mouse ', ' transformation]);
 end
 
-
-%% Average PC scores by behavior (within mice)
+%% Average data values by behavior (within mice)
 % Always clear loop list first. 
 if isfield(parameters, 'loop_list')
 parameters = rmfield(parameters,'loop_list');
@@ -126,6 +125,7 @@ end
 
 % Iterators
 parameters.loop_list.iterators = {
+               'data_type',  {'loop_variables.data_type'}, 'data_type_iterator';
                'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
                'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'; 
                'period', {'loop_variables.periods'}, 'period_iterator';            
@@ -137,18 +137,18 @@ parameters.loop_variables.periods = periods_bothConditions.condition;
 parameters.averageDim = 3;
 
 % Input 
-parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'fluorescence analysis\PCA across mice\'],'transformation', '\', 'mouse', '\instances reshaped\'};
+parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
 parameters.loop_list.things_to_load.data.filename= {'values.mat'};
 parameters.loop_list.things_to_load.data.variable= {'values{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_load.data.level = 'mouse';
 
 % Output
-parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'fluorescence analysis\PCA across mice\'],'transformation', '\', 'mouse', '\instances reshaped\'};
+parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
 parameters.loop_list.things_to_save.average.filename= {'values_average.mat'};
 parameters.loop_list.things_to_save.average.variable= {'values_average{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_save.average.level = 'mouse';
 
-parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'fluorescence analysis\PCA across mice\'],'transformation', '\', 'mouse', '\instances reshaped\'};
+parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
 parameters.loop_list.things_to_save.std_dev.filename= {'values_std.mat'};
 parameters.loop_list.things_to_save.std_dev.variable= {'values_std{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_save.std_dev.level = 'mouse';
