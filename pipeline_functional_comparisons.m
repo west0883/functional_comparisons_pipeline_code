@@ -433,15 +433,73 @@ parameters.loop_list.things_to_save.data_evaluated.variable= {'values_number{', 
 parameters.loop_list.things_to_save.data_evaluated.level = 'mouse';
 
 parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
-parameters.loop_list.things_to_save.average.filename= {'values_averaged.mat'};
+parameters.loop_list.things_to_save.average.filename= {'values_average.mat'};
 parameters.loop_list.things_to_save.average.variable= {'values_average{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_save.average.level = 'mouse';
 
+parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
+parameters.loop_list.things_to_save.std_dev.filename= {'values_std.mat'};
+parameters.loop_list.things_to_save.std_dev.variable= {'values_std{', 'period_iterator', ', 1}'}; 
+parameters.loop_list.things_to_save.std_dev.level = 'mouse';
+
 RunAnalysis({@EvaluateOnData, @AverageData}, parameters);
 
-%% Across mice-- concatenate the average variable duration values.
+%% Across mice-- concatenate & average the average variable duration values.
+variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
+                    'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
+                    'm_stop_ending'};
 
-%% Across mice -- average the average variable duration values.
+if isfield(parameters, 'loop_list')
+parameters = rmfield(parameters,'loop_list');
+end
+
+parameters.loop_variables.periods = variable_periods;
+
+% Iterators
+parameters.loop_list.iterators = {
+               'data_type', {'loop_variables.data_type'}, 'data_type_iterator';
+               'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
+               'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'; 
+               'period', {'loop_variables.periods'}, 'period_iterator';  
+               };
+
+parameters.concatDim = 3;
+
+% Input
+parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\', 'mouse', '\'};
+parameters.loop_list.things_to_load.data.filename= {'values_average.mat'};
+parameters.loop_list.things_to_load.data.variable= {'values_average{', 'period_iterator', ', 1}'}; 
+parameters.loop_list.things_to_load.data.level = 'mouse';
+
+% Output
+parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\across mice\'};
+parameters.loop_list.things_to_save.average.filename= {'values_permouse.mat'};
+parameters.loop_list.things_to_save.average.variable= {'values{', 'period_iterator', ', 1}'}; 
+parameters.loop_list.things_to_save.average.level = 'transformation';
+
+parameters.loop_list.things_to_rename = {{'concatenated_data', 'data'}};
+
+RunAnalysis({@ConcatenateData, @AverageData}, parameters);
+
+%% Across mice -- count the (average) number of instances per mouse contributing to 
+% the the values in the variable duration periods.
+variable_periods = {'m_start', 'm_stop', 'm_accel', 'm_decel', ...
+                    'm_p_nowarn_start', 'm_p_nowarn_stop', 'm_p_nowarn_accel', 'm_p_nowarn_decel', ...
+                    'm_stop_ending'};
+
+% Input 
+parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\', 'transformation','\variable duration\no division\', 'mouse', '\'};
+parameters.loop_list.things_to_load.data.filename= {'values_number.mat'};
+parameters.loop_list.things_to_load.data.variable= {'values_number{', 'period_iterator', ', 1}'}; 
+parameters.loop_list.things_to_load.data.level = 'mouse';
+
+% Output
+parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'functional comparisons\'], 'data_type', '\','transformation','\variable duration\no division\across mice\'};
+parameters.loop_list.things_to_save.average.filename= {'values_permouse.mat'};
+parameters.loop_list.things_to_save.average.variable= {'values{', 'period_iterator', ', 1}'}; 
+parameters.loop_list.things_to_save.average.level = 'transformation';
+
+RunAnalysis({@ConcatenateData, @AverageData}, parameters);
 
 %% Concatenate variable durations together, divided by acceleration rate
 % Then average.
@@ -563,6 +621,8 @@ parameters.loop_list.things_to_save.average.variable= {'values_averaged.x', 'acc
 parameters.loop_list.things_to_save.average.level = 'period';
 
 RunAnalysis({@EvaluateOnData, @AverageData}, parameters);
+
+
 
 %% Across mice-- concatenate the average accel divided values.
 
