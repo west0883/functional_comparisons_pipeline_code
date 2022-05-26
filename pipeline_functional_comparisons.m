@@ -53,7 +53,7 @@ periods_bothConditions = [periods_nametable_motorized; periods_nametable_spontan
 
 % Make list of transformation types for iterating later.
 parameters.loop_variables.transformations = {'not transformed'; 'Fisher transformed'};
-parameters.loop_variables.data_type = {'correlations', 'PCA scores individual mouse'};
+parameters.loop_variables.data_type = {'correlations', 'PCA individual mouse'};
 parameters.loop_variables.mice_all = parameters.mice_all;
 parameters.loop_variables.conditions = conditions;
 parameters.loop_variables.conditions_stack_locations = conditions_stack_locations;
@@ -132,24 +132,24 @@ parameters.loop_list.iterators = {
                'period', {'loop_variables.periods'}, 'period_iterator';            
                };
 
-parameters.loop_variables.periods = periods_bothConditions; 
+parameters.loop_variables.periods = periods_bothConditions.condition; 
 
 % 
 parameters.averageDim = 3;
 
 % Input 
-parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'fluorescence analysis\PCA scores individual mouse\'],'transformation', '\', 'mouse', '\instances reshaped\'};
+parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'fluorescence analysis\PCA individual mouse\'],'transformation', '\', 'mouse', '\instances reshaped\'};
 parameters.loop_list.things_to_load.data.filename= {'values.mat'};
 parameters.loop_list.things_to_load.data.variable= {'values{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_load.data.level = 'mouse';
 
 % Output
-parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'fluorescence analysis\PCA scores individual mouse\'],'transformation', '\', 'mouse', '\instances reshaped\'};
+parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'fluorescence analysis\PCA individual mouse\'],'transformation', '\', 'mouse', '\instances reshaped\'};
 parameters.loop_list.things_to_save.average.filename= {'values_average.mat'};
 parameters.loop_list.things_to_save.average.variable= {'values_average{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_save.average.level = 'mouse';
 
-parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'fluorescence analysis\PCA scores individual mouse\'],'transformation', '\', 'mouse', '\instances reshaped\'};
+parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'fluorescence analysis\PCA individual mouse\'],'transformation', '\', 'mouse', '\instances reshaped\'};
 parameters.loop_list.things_to_save.std_dev.filename= {'values_std.mat'};
 parameters.loop_list.things_to_save.std_dev.variable= {'values_std{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_save.std_dev.level = 'mouse';
@@ -164,15 +164,15 @@ filename = 'values_average.mat';
 
 for transi = 1:numel(transformations)
 
-    transformation = transformations{transi};
-    load(['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\fluorescence analysis\PCA scores individual mouse\' transformation '\' mouse '\instances reshaped\' filename])
+    transformation = parameters.loop_variables.transformations{transi};
+    load(['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\fluorescence analysis\PCA individual mouse\' transformation '\' mouse '\instances reshaped\' filename])
 
     scores = [values_average{180} values_average{190} values_average{176} values_average{177} values_average{178} values_average{179} values_average{189}];
     figure; imagesc(scores(1:20,:));
     xticklabels({'motor rest', 'spon rest', '1600', '2000', '2400', '2800', 'spon walk'});
     colorbar;
     title([mouse ', ' transformation]);
-    savefig(['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\fluorescence analysis\PCA scores individual mouse\' transformation '\' mouse '\average_walk_rest_values_first20.fig']);
+    savefig(['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\fluorescence analysis\PCA individual mouse\' transformation '\' mouse '\average_walk_rest_values_first20.fig']);
 
 end
 
@@ -439,7 +439,7 @@ parameters.loop_list.iterators = {
                'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
                'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'};
 
-parameters.spontaneous_periods_dir = {[parameters.dir_exper 'fluorescence analysis\PCA scores individual mouse\'], 'transformation', '\', 'mouse', '\instances reshaped\'};
-parameters.motorized_periods_dir = {[parameters.dir_exper 'functional comparisons\PCA scores individual mouse\'], 'transformation', '\variable duration\by accel\', 'mouse', '\'};
-parameters.dir_out = {[parameters.dir_exper 'functional comparisons\PCA scores individual mouse\'], 'transformation', '\all starts and stops\', 'mouse', '\'};
+parameters.spontaneous_periods_dir = {[parameters.dir_exper 'fluorescence analysis\PCA individual mouse\'], 'transformation', '\', 'mouse', '\instances reshaped\'};
+parameters.motorized_periods_dir = {[parameters.dir_exper 'functional comparisons\PCA individual mouse\'], 'transformation', '\variable duration\by accel\', 'mouse', '\'};
+parameters.dir_out = {[parameters.dir_exper 'functional comparisons\PCA individual mouse\'], 'transformation', '\all starts and stops\', 'mouse', '\'};
 plot_starts_and_stops_together(parameters);
