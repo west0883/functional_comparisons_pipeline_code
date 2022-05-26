@@ -60,8 +60,45 @@ parameters.loop_variables.conditions_stack_locations = conditions_stack_location
 parameters.loop_variables.accelerations.startstop = {'400', '800'};
 parameters.loop_variables.accelerations.acceldecell = {'200', '800'};
 
+%% Average data values by behavior (within mice)
+% Always clear loop list first. 
+if isfield(parameters, 'loop_list')
+parameters = rmfield(parameters,'loop_list');
+end
 
-%% Visualize difference in mean continued rest & walk for motorized & spontaneous
+% Iterators
+parameters.loop_list.iterators = {
+               'data_type',  {'loop_variables.data_type'}, 'data_type_iterator';
+               'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
+               'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'; 
+               'period', {'loop_variables.periods'}, 'period_iterator';            
+               };
+
+parameters.loop_variables.periods = periods_bothConditions.condition; 
+
+% 
+parameters.averageDim = 3;
+
+% Input 
+parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
+parameters.loop_list.things_to_load.data.filename= {'values.mat'};
+parameters.loop_list.things_to_load.data.variable= {'values{', 'period_iterator', ', 1}'}; 
+parameters.loop_list.things_to_load.data.level = 'mouse';
+
+% Output
+parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
+parameters.loop_list.things_to_save.average.filename= {'values_average.mat'};
+parameters.loop_list.things_to_save.average.variable= {'values_average{', 'period_iterator', ', 1}'}; 
+parameters.loop_list.things_to_save.average.level = 'mouse';
+
+parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
+parameters.loop_list.things_to_save.std_dev.filename= {'values_std.mat'};
+parameters.loop_list.things_to_save.std_dev.variable= {'values_std{', 'period_iterator', ', 1}'}; 
+parameters.loop_list.things_to_save.std_dev.level = 'mouse';
+
+RunAnalysis({@AverageData}, parameters);
+
+%% Correltions, individual mice -- Visualize difference in mean continued rest & walk for motorized & spontaneous
 mouse ='1087';
 cmap_corrs = parula(256); 
 cmap_diffs = flipud(cbrewer('div', 'RdBu', 256, 'nearest'));
@@ -117,43 +154,25 @@ for transi = 1:numel(parameters.loop_variables.transformations)
     sgtitle([mouse ', ' transformation]);
 end
 
-%% Average data values by behavior (within mice)
-% Always clear loop list first. 
-if isfield(parameters, 'loop_list')
-parameters = rmfield(parameters,'loop_list');
+%% Individual mice -- plot mean PC scores for continued rest & walk 
+mouse ='1087';
+
+filename = 'values_average.mat';
+
+for transi = 1:numel(parameters.loop_variables.transformations)
+
+    transformation = parameters.loop_variables.transformations{transi};
+    load(['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\fluorescence analysis\PCA across mice\' transformation '\' mouse '\instances reshaped\' filename])
+
+    scores = [values_average{180} values_average{190} values_average{176} values_average{177} values_average{178} values_average{179} values_average{189}];
+    figure; imagesc(scores(1:20,:));
+    xticklabels({'motor rest', 'spon rest', '1600', '2000', '2400', '2800', 'spon walk'});
+    colorbar;
+    title([mouse ', ' transformation]);
+    dir_out = ['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\functional comparisons\PCA across mice\' transformation '\average walk and rest\' mouse '\'];
+    mkdir(dir_out);
+    savefig([dir_out 'average_walk_rest_values_first20.fig']);
 end
-
-% Iterators
-parameters.loop_list.iterators = {
-               'data_type',  {'loop_variables.data_type'}, 'data_type_iterator';
-               'transformation', {'loop_variables.transformations'}, 'transformation_iterator';
-               'mouse', {'loop_variables.mice_all(:).name'}, 'mouse_iterator'; 
-               'period', {'loop_variables.periods'}, 'period_iterator';            
-               };
-
-parameters.loop_variables.periods = periods_bothConditions.condition; 
-
-% 
-parameters.averageDim = 3;
-
-% Input 
-parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
-parameters.loop_list.things_to_load.data.filename= {'values.mat'};
-parameters.loop_list.things_to_load.data.variable= {'values{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_load.data.level = 'mouse';
-
-% Output
-parameters.loop_list.things_to_save.average.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
-parameters.loop_list.things_to_save.average.filename= {'values_average.mat'};
-parameters.loop_list.things_to_save.average.variable= {'values_average{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.average.level = 'mouse';
-
-parameters.loop_list.things_to_save.std_dev.dir = {[parameters.dir_exper 'fluorescence analysis\'],'data type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
-parameters.loop_list.things_to_save.std_dev.filename= {'values_std.mat'};
-parameters.loop_list.things_to_save.std_dev.variable= {'values_std{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.std_dev.level = 'mouse';
-
-RunAnalysis({@AverageData}, parameters);
 
 %% Take the averaged individual mice values & concatenate across mice.
 % Always clear loop list first. 
@@ -227,25 +246,9 @@ parameters.loop_list.things_to_save.std_dev.level = 'transformation';
 
 RunAnalysis({@AverageData}, parameters);
 
-%% plot mean PC scores for continued rest & walk 
-mouse ='1087';
+%% Across mice -- plot mean correlations for continued rest & walk.
 
-filename = 'values_average.mat';
-
-for transi = 1:numel(parameters.loop_variables.transformations)
-
-    transformation = parameters.loop_variables.transformations{transi};
-    load(['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\fluorescence analysis\PCA across mice\' transformation '\' mouse '\instances reshaped\' filename])
-
-    scores = [values_average{180} values_average{190} values_average{176} values_average{177} values_average{178} values_average{179} values_average{189}];
-    figure; imagesc(scores(1:20,:));
-    xticklabels({'motor rest', 'spon rest', '1600', '2000', '2400', '2800', 'spon walk'});
-    colorbar;
-    title([mouse ', ' transformation]);
-    dir_out = ['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\functional comparisons\PCA across mice\' transformation '\average walk and rest\' mouse '\'];
-    mkdir(dir_out);
-    savefig([dir_out 'average_walk_rest_values_first20.fig']);
-end
+%% Across mice -- plot mean PC scores for continued rest & walk 
 
 %%  Within mice -- Visualize average values across rolled periods that may need to be compared
 % Is all periods except continued rest & walk.
@@ -436,6 +439,10 @@ parameters.loop_list.things_to_save.average.level = 'mouse';
 
 RunAnalysis({@EvaluateOnData, @AverageData}, parameters);
 
+%% Across mice-- concatenate the average variable duration values.
+
+%% Across mice -- average the average variable duration values.
+
 %% Concatenate variable durations together, divided by acceleration rate
 % Then average.
 % Try to plot with alpha values proportional to number of instances
@@ -557,6 +564,9 @@ parameters.loop_list.things_to_save.average.level = 'period';
 
 RunAnalysis({@EvaluateOnData, @AverageData}, parameters);
 
+%% Across mice-- concatenate the average accel divided values.
+
+%% Across mice -- average the average accel divided values across mice.
 
 %% Plot starts & stops together in same figures (per mouse)
 % (divided by accel)
@@ -573,3 +583,5 @@ parameters.spontaneous_periods_dir = {[parameters.dir_exper 'fluorescence analys
 parameters.motorized_periods_dir = {[parameters.dir_exper 'functional comparisons\PCA across mice\'], 'transformation', '\variable duration\divided by accel\', 'mouse', '\'};
 parameters.dir_out = {[parameters.dir_exper 'functional comparisons\PCA across mice\'], 'transformation', '\all starts and stops\', 'mouse', '\'};
 plot_starts_and_stops_together(parameters);
+
+%% Across mice -- Plot starts & stops together in same figures.
