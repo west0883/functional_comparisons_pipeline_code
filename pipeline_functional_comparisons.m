@@ -196,7 +196,7 @@ parameters.loop_list.iterators = {
 
 parameters.loop_variables.periods = variable_periods;
 parameters.periods_nametable = periods_bothConditions;
-parameters.periods_bothConditions = periods_bothConditions;
+parameters.periods_bothConditions = periods_bothConditions.condition;
 
 % Input
 parameters.loop_list.things_to_load.data.dir = {[parameters.dir_exper 'fluorescence analysis\'], 'data_type', '\', 'transformation', '\', 'mouse', '\instances reshaped\'};
