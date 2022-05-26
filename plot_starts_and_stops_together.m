@@ -51,11 +51,18 @@ function [] = plot_starts_and_stops_together(parameters)
         load([load_dir_string 'm_stop_averaged.mat'], 'values_averaged');
         m_stop_400 = values_averaged.x400(1:20,:);
         m_stop_800 = values_averaged.x800(1:20,:);
+        load([load_dir_string 'm_stop_ending_averaged.mat'], 'values_averaged');
+        m_stop_ending_400 = values_averaged.x400(1:20,:);
+        m_stop_ending_800 = values_averaged.x800(1:20,:);
+        
+
 
         figure;
-        subplot(3, 24, 17:24); imagesc(stopwalk);  caxis([-2 2]); title('stopwalk'); 
-        subplot(3, 1, 2); imagesc(m_stop_400);  caxis([-2 2]); title('motorized stop, accel 400');
-        subplot(3, 1, 3); imagesc(m_stop_800);  caxis([-2 2]); title('motorized stop, accel 800');
+        subplot(5, 24, 17:24); imagesc(stopwalk);  caxis([-2 2]); title('stopwalk'); 
+        subplot(5, 1, 2); imagesc(m_stop_400);  caxis([-2 2]); title('motorized stop, accel 400');
+        subplot(5, 1, 3); imagesc(m_stop_800);  caxis([-2 2]); title('motorized stop, accel 800');
+        subplot(5, 1, 4); imagesc(m_stop_ending_400);  caxis([-2 2]); title('motorized stop ending aligned, accel 400');
+        subplot(5, 1, 5); imagesc(m_stop_ending_800);  caxis([-2 2]); title('motorized stop ending aligned, accel 800');
         sgtitle(['PCA scores individual mouse, ' strjoin(values(1:numel(values)/2), ', ')]);
         savefig([output_dir 'all_stops_together.fig']);
     end 
