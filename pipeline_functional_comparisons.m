@@ -70,9 +70,9 @@ figure;
 
 filename = 'correlations_rolled_average.mat';
 
-for transi = 1:numel(transformations)
+for transi = 1:numel(parameters.loop_variables.transformations)
 
-    transformation = transformations{transi};
+    transformation = parameters.loop_variables.transformations{transi};
     motor = load([parameters.dir_exper 'fluorescence analysis\correlations\' transformation '\' mouse '\average rolled\' filename]);
     figure;
     spon_walk.average = motor.average{190};
@@ -162,7 +162,7 @@ mouse ='1087';
 
 filename = 'values_average.mat';
 
-for transi = 1:numel(transformations)
+for transi = 1:numel(parameters.loop_variables.transformations)
 
     transformation = parameters.loop_variables.transformations{transi};
     load(['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\fluorescence analysis\PCA individual mouse\' transformation '\' mouse '\instances reshaped\' filename])
