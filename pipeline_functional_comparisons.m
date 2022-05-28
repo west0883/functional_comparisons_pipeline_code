@@ -177,10 +177,10 @@ parameters.loop_list.things_to_save.concatenated_data.filename= {'values_all_ave
 parameters.loop_list.things_to_save.concatenated_data.variable= {'values_all_averages{', 'period_iterator', ', 1}'}; 
 parameters.loop_list.things_to_save.concatenated_data.level = 'transformation';
 
-parameters.loop_list.things_to_save.concatenated_origin.dir = {[parameters.dir_exper 'fluorescence analysis\'], 'data_type', '\', 'transformation', '\averages across mice\'};
-parameters.loop_list.things_to_save.concatenated_origin.filename= {'values_all_averages_concatenation_origin.mat'};
-parameters.loop_list.things_to_save.concatenated_origin.variable= {'values_concatenation_origin{', 'period_iterator', ', 1}'}; 
-parameters.loop_list.things_to_save.concatenated_origin.level = 'transformation';
+% parameters.loop_list.things_to_save.concatenated_origin.dir = {[parameters.dir_exper 'fluorescence analysis\'], 'data_type', '\', 'transformation', '\averages across mice\'};
+% parameters.loop_list.things_to_save.concatenated_origin.filename= {'values_all_averages_concatenation_origin.mat'};
+% parameters.loop_list.things_to_save.concatenated_origin.variable= {'values_concatenation_origin{', 'period_iterator', ', 1}'}; 
+% parameters.loop_list.things_to_save.concatenated_origin.level = 'transformation';
 
 RunAnalysis({@ConcatenateData}, parameters);
 
