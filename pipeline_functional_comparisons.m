@@ -117,7 +117,7 @@ parameters.loop_list.things_to_load.data.variable = {'values_average'};
 parameters.loop_list.things_to_load.data.level = 'mouse';
 
 % Output 
-parameters.loop_list.things_to_save.fig.dir = {[parameters.dir_exper 'functional comparisons\correlations\'], 'transformation', '\rest and walk\', 'mouse'};
+parameters.loop_list.things_to_save.fig.dir = {[parameters.dir_exper 'functional comparisons\correlations\'], 'transformation', '\rest and walk\', 'mouse' , '\'};
 parameters.loop_list.things_to_save.fig.filename = {'continued_rest_walk.fig'};
 parameters.loop_list.things_to_save.fig.variable = {'fig'}; 
 parameters.loop_list.things_to_save.fig.level = 'mouse';
@@ -139,7 +139,7 @@ for transi = 1:numel(parameters.loop_variables.transformations)
     scores = [values_average{180} values_average{190} values_average{176} values_average{177} values_average{178} values_average{179} values_average{189}];
     figure; imagesc(scores(1:20,:));
     xticklabels({'motor rest', 'spon rest', '1600', '2000', '2400', '2800', 'spon walk'});
-    colorbar;
+    colorbar; caxis([-2 2]);
     title([mouse ', ' transformation]);
     dir_out = ['Y:\Sarah\Analysis\Experiments\Random Motorized Treadmill\functional comparisons\PCA across mice\' transformation '\average walk and rest\' mouse '\'];
     mkdir(dir_out);
