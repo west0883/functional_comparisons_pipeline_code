@@ -78,10 +78,14 @@ function [behavior_indices, holder_table] = SubFindBehaviorPairs(behavior_indice
 
           % Find matches that also match this variable.
           % If value is a string:
-          matches = matches(string(matches.(matching_variable)) == value, :); 
+          if isstring(value)
+            matches = matches(string(matches.(matching_variable)) == value, :); 
 
           % If value is a number:
-          
+          elseif isnumeric(value)
+            matches = matches(cell2mat(matches.(matching_variable)) == value, :);           
+
+          end 
 
       end 
       
@@ -89,7 +93,7 @@ function [behavior_indices, holder_table] = SubFindBehaviorPairs(behavior_indice
       holder_table(matches.index, :) = []; 
 
       % Put behaviors into useful place.
-      sub_cell =  {matches.indices matches};
+      sub_cell =  {matches.index matches};
       behavior_indices = [behavior_indices; sub_cell];
  
 end 
