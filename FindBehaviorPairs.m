@@ -34,6 +34,9 @@ function [behavior_indices] = FindBehaviorPairs(behaviors, divideby, ignore, per
     matching_variables = variable_names;
     matching_variables(any(indices_to_remove,1)) = []; 
 
+    % Make an empty cell for holding behavior_indices. (Is concatenated
+    % across behavior periods).
+    behavior_indices = cell(1, 2);
 
     % For each behavior condition,
     for behaviori = 1:numel(behaviors)
@@ -42,7 +45,7 @@ function [behavior_indices] = FindBehaviorPairs(behaviors, divideby, ignore, per
         % Make a holder table for all entries of periods_nametable for that
         % condition.
         holder_table = periods_nametable(string(periods_nametable.condition) == behavior, :);
-        behavior_indices = cell(1, 2);
+        
 
         while size(holder_table, 1) > 0
 
@@ -50,9 +53,24 @@ function [behavior_indices] = FindBehaviorPairs(behaviors, divideby, ignore, per
 
         end 
 
+    end
 
-        % Now that you have them in groups of matches, divide the behaviors
-        % into sub-groups based on the divideby value
+    % Now that you have them in groups of matches, divide the behaviors
+    % into sub-groups based on the divideby value. 
+
+    % Find all possible values of the "divideby" to use. 
+    divide_values = unique(periods_nametable.(divideby));
+    
+    % Skip the first row (is empty).
+    for behaviori = 2:size(behavior_indices, 1)
+
+        % For each possible value of the subdivide parameter.
+        for subdividei = 1:numel(divide_values)
+
+
+
+
+        end     
     end
 
 end 
@@ -90,10 +108,18 @@ function [behavior_indices, holder_table] = SubFindBehaviorPairs(behavior_indice
       end 
       
       % Remove matches from holder_table.
-      holder_table(matches.index, :) = []; 
+      indices_to_remove = []; 
+      for matchesi = 1:numel(matches.index)
+            
+         if holder_table{matchesi, 'index'} == matches{matchesi, 'index'}
+            indices_to_remove = [indices_to_remove; matchesi];
+         end
+
+      end
+      holder_table(indices_to_remove, :) = []; 
 
       % Put behaviors into useful place.
-      sub_cell =  {matches.index matches};
+      sub_cell =  {[first_entry.index; matches.index] [first_entry; matches]};
       behavior_indices = [behavior_indices; sub_cell];
  
 end 
